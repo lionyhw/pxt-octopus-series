@@ -1,2 +1,2 @@
 # pxt-octoputs
-octoputs Electronic blocks (input/output/sensor/ ) for micro:bit
+octoputs electronic blocks (input/output/sensor) for micro:bit
