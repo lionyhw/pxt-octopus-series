@@ -1,0 +1,16 @@
+{
+    "name": "octoputs",
+    "version": "1.0.0",
+    "description": "octoputs Electronic blocks(input/output/sensor)for micro:bit by ELECFREAKS ",
+    "license": "MIT",
+    "dependencies": {
+        "Sonarbit": "github:lionyhw/pxt-sonarbit",
+		"neopixel": "github:lionyhw/pxt-neopixel"
+    },
+    "files": [
+        "README.md"
+    ],
+    "testFiles": [
+    ],
+    "public": true
+}
