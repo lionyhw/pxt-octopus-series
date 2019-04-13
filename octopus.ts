@@ -91,13 +91,13 @@ namespace octopus_output {
         None
     }
     export enum BME280_static {
-        //% block="Temperature?" enumval=0
+        //% block="Temperature(℃)" enumval=0
         Temperature,
-        //% block="Humidity" enumval=1
+        //% block="Humidity(RH)" enumval=1
         Humidity,
-        //% block="Pressure" enumval=2
+        //% block="Pressure(Pa)" enumval=2
         Pressure,
-        //% block="Altitude" enumval=3
+        //% block="Altitude(M)" enumval=3
         Altitude
     }
     export enum Distance_Unit_Static {
