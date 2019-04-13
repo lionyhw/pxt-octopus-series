@@ -4,9 +4,6 @@
     "description": "octoputs Electronic blocks for micro:bit by ELECFREAKS ",
     "license": "MIT",
     "dependencies": {
-        "octoputs-input": "github:lionyhw/pxt-octoputs-input",
-	"octoputs-output": "github:lionyhw/pxt-octoputs-output",
-	"octoputs-sensor": "github:lionyhw/pxt-octoputs-sensor"
     },
     "files": [
         "README.md"
