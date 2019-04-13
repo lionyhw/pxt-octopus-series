@@ -7,7 +7,7 @@
 
 
 //% weight=100 color=#fc8715  icon="\uf1e6" block="octopus"
-//% groups='["8*16Matrix","DigitalPin","AnalogPin","IIC Interface"]'
+//% groups='["8*16Matrix","DigitalPin","AnalogPin","IIC Interface","RTC1307"]'
 namespace octopus_output {
     /************************************************************Value********************************************************/
     let initialized = false
@@ -54,23 +54,34 @@ namespace octopus_output {
     setreg(0xF4, 0x2F)
     setreg(0xF5, 0x0C)
     setreg(0xF4, 0x2F)
+    //DS1307RTC
+    let DS1307_I2C_ADDR = 0x68;
+    let DS1307_REG_SECOND = 0
+    let DS1307_REG_MINUTE = 1
+    let DS1307_REG_HOUR = 2
+    let DS1307_REG_WEEKDAY = 3
+    let DS1307_REG_DAY = 4
+    let DS1307_REG_MONTH = 5
+    let DS1307_REG_YEAR = 6
+    let DS1307_REG_CTRL = 7
+    let DS1307_REG_RAM = 8
     /*******************************************************************************************************************/
 
 
     /***************************************************listStyleType***************************************************/
-    export enum Relay_static {
+    export enum Relay_state {
         //% block="NC:open|NO:close" enumval=0
-        static0,
+        state0,
         //% block="NC:close|NO:open" enumval=1
-        static1
+        state1
     }
-    export enum Button_static {
+    export enum Button_state {
         //% block="pressed" enumval=0
         pressed,
         //% block="unpressed" enumval=1
         unpressed
     }
-    export enum ADKeyPad_static {
+    export enum ADKeyPad_state {
         //% block="A" enumval=0
         A,
         //% block="B" enumval=1
@@ -82,7 +93,7 @@ namespace octopus_output {
         //% block="E" enumval=4
         E
     }
-    export enum Vibration_Motor_Static {
+    export enum Vibration_Motor_state {
         //% block="once" enumval=0
         Once,
         //% block="Always" enumval=1
@@ -90,7 +101,7 @@ namespace octopus_output {
         //% block="none" enumval=2
         None
     }
-    export enum BME280_static {
+    export enum BME280_state {
         //% block="Temperature(℃)" enumval=0
         Temperature,
         //% block="Humidity(RH)" enumval=1
@@ -100,7 +111,7 @@ namespace octopus_output {
         //% block="Altitude(M)" enumval=3
         Altitude
     }
-    export enum Distance_Unit_Static {
+    export enum Distance_Unit_state {
         //% block="mm" enumval=0
         Distance_Unit_mm,
         //% block="cm" enumval=1
@@ -108,6 +119,43 @@ namespace octopus_output {
         //% block="inch" enumval=2
         Distance_Unit_inch
     }
+    export enum Tracking_state {
+        //% block="● ●" enumval=0
+        Tracking_State_0,
+        //% block="◌ ●" enumval=1
+        Tracking_State_1,
+        //% block="● ◌" enumval=2
+        Tracking_State_2,
+        //% block="◌ ◌" enumval=3
+        Tracking_State_3
+    }
+    export enum Tilt_Sensor_state {
+        //% block="Left" enumval=0
+        pressed,
+        //% block="Right" enumval=1
+        unpressed
+    }
+    export enum TimeType_state {
+        //% block="second" enumval=0
+        SECOND,
+        //% block="minute" enumval=1
+        MINUTE,
+        //% block="hour" enumval=2
+        HOUR,
+        //% block="day" enumval=3
+        DAY,
+        //% block="month" enumval=4
+        MONTH,
+        //% block="year" enumval=5
+        YEAR
+    }
+	export enum Photo_Sensor_state {
+        //% block="◌" enumval=0
+        Tracking_State_0,
+        //% block="●" enumval=1
+        Tracking_State_1
+    }
+	
 
     /***************************************************************************************************************/
 
@@ -238,6 +286,23 @@ namespace octopus_output {
         if (var2 > 419430400) var2 = 419430400
         H = (var2 >> 12) / 1024
     }
+    ///////////////////////////rtc1307
+    function RTC_setReg(reg: number, dat: number): void {
+        let buf = pins.createBuffer(2);
+        buf[0] = reg;
+        buf[1] = dat;
+        pins.i2cWriteBuffer(DS1307_I2C_ADDR, buf);
+    }
+    function RTC_getReg(reg: number): number {
+        pins.i2cWriteNumber(DS1307_I2C_ADDR, reg, NumberFormat.UInt8BE);
+        return pins.i2cReadNumber(DS1307_I2C_ADDR, NumberFormat.UInt8BE);
+    }
+    function HexToDec(dat: number): number {
+        return (dat >> 4) * 10 + (dat % 16);
+    }
+    function DecToHex(dat: number): number {
+        return Math.idiv(dat, 10) * 16 + (dat % 10)
+    }
 
 
 
@@ -246,13 +311,13 @@ namespace octopus_output {
 
     /****************************************************************Blockcode******************************************************/
     /*******************Input*****************/
-    //% block="connect %pin Button is %static"
-    //% static.fieldEditor="gridpicker"
-    //% static.fieldOptions.columns=2
+    //% block="connect %pin Button is %state"
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
     //% subcategory="Input"
     //% group=DigitalPin
-    export function octopus_Button(pin: DigitalPin, static: Button_static): boolean {
-        switch (static) {
+    export function octopus_Button(pin: DigitalPin, state: Button_state): boolean {
+        switch (state) {
             case 0:
                 if (pins.digitalReadPin(pin) == 0) {
                     return true;
@@ -291,13 +356,13 @@ namespace octopus_output {
     export function octopus_Rotation_Linear(pin: AnalogPin): number {
         return pins.analogReadPin(pin);
     }
-    //% block="connect %pin ADKeyPad %static is pressed"
-    //% static.fieldEditor="gridpicker"
-    //% static.fieldOptions.columns=5
+    //% block="connect %pin ADKeyPad %state is pressed"
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=5
     //% subcategory="Input"
     //% group=AnalogPin
-    export function octopus_ADKeyPad(pin: AnalogPin, static: ADKeyPad_static): boolean {
-        switch (static) {
+    export function octopus_ADKeyPad(pin: AnalogPin, state: ADKeyPad_state): boolean {
+        switch (state) {
             case 0:
                 if (pins.analogReadPin(pin) > 0 && pins.analogReadPin(pin) < 20) {
                     return true;
@@ -342,13 +407,13 @@ namespace octopus_output {
                 return false
         }
     }
-    //% block="connect %pin Push Lock E-Switch is %static"
-    //% static.fieldEditor="gridpicker"
-    //% static.fieldOptions.columns=2
+    //% block="connect %pin Push Lock E-Switch is %state"
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
     //% subcategory="Input"
     //% group=DigitalPin
-    export function octopus_Push_Lock(pin: DigitalPin, static: Button_static): boolean {
-        switch (static) {
+    export function octopus_Push_Lock(pin: DigitalPin, state: Button_state): boolean {
+        switch (state) {
             case 0:
                 if (pins.digitalReadPin(pin) == 0) {
                     return true;
@@ -371,11 +436,11 @@ namespace octopus_output {
     }
 
     /***************************************************output**************************************************/
-    //% block="connect %pin Relay  %static"
+    //% block="connect %pin Relay  %state"
     //% subcategory="Output"
     //% group=DigitalPin
-    export function octopus_Relay(pin: DigitalPin, static: Relay_static): void {
-        switch (static) {
+    export function octopus_Relay(pin: DigitalPin, state: Relay_state): void {
+        switch (state) {
             case 0:
                 pins.digitalWritePin(pin, 1);
                 break;
@@ -435,11 +500,11 @@ namespace octopus_output {
         pins.analogSetPeriod(pin, 1000)
         pins.analogWritePin(pin, speed)
     }
-    //% block="connect %pin Vibration Motor make vibration %static"
+    //% block="connect %pin Vibration Motor make vibration %state"
     //% subcategory="Output"
     //% group=DigitalPin
-    export function octopus_Vibration_Motor(pin: DigitalPin, static: Vibration_Motor_Static): void {
-        switch (static) {
+    export function octopus_Vibration_Motor(pin: DigitalPin, state: Vibration_Motor_state): void {
+        switch (state) {
             case 0:
                 pins.digitalWritePin(pin, 1)
                 basic.pause(10)
@@ -455,11 +520,11 @@ namespace octopus_output {
 
     }
     /*****************************************************sensor**************************************************/
-    //% block="connect IIC BME280 value %static"
+    //% block="connect IIC BME280 value %state"
     //% subcategory="Sensor"
     //% group=IIC Interface
-    export function octopus_BME280(static: BME280_static): number {
-        switch (static) {
+    export function octopus_BME280(state: BME280_state): number {
+        switch (state) {
             case 0:
                 get();
                 return Math.round(T);
@@ -481,10 +546,10 @@ namespace octopus_output {
         }
         return 0;
     }
-    //% block="connect %pin Sonarbit value %static"
+    //% block="connect %pin Sonarbit value %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
-    export function octopus_Sonarbit(pin: DigitalPin, static: Distance_Unit_Static): number {
+    export function octopus_Sonarbit(pin: DigitalPin, state: Distance_Unit_state): number {
         pins.setPull(pin, PinPullMode.PullNone)
         pins.digitalWritePin(pin, 0)
         control.waitMicros(2)
@@ -496,7 +561,7 @@ namespace octopus_output {
         if (distance > 4000) {
             distance = 0
         }
-        switch (static) {
+        switch (state) {
             case 0:
                 return Math.round(distance) //mm
                 break
@@ -510,8 +575,8 @@ namespace octopus_output {
                 return 0
         }
     }
-	//% block="connect %pin pm2.5 sensor value"
-	//% subcategory="Sensor"
+    //% block="connect %pin pm2.5 sensor value"
+    //% subcategory="Sensor"
     //% group=DigitalPin
     export function octopus_PM25(pin: DigitalPin): number {
         let pm25 = 0
@@ -526,6 +591,153 @@ namespace octopus_output {
         pm25 = pm25 / 1000 - 2
         return pm25;
     }
-	
+    //% block="connect %lpin left port %rpin right port Tracking is %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    export function octopus_2_Channel_Tracking(lpin: DigitalPin, rpin: DigitalPin, state: Tracking_state): boolean {
+        pins.setPull(lpin, PinPullMode.PullUp)
+        pins.setPull(rpin, PinPullMode.PullUp)
+        let left_tracking = pins.digitalReadPin(lpin);
+        let right_tracking = pins.digitalReadPin(rpin);
+        if (left_tracking == 0 && right_tracking == 0 && state == 0) {
+            return true;
+        }
+        else if (left_tracking == 1 && right_tracking == 0 && state == 1) {
+            return true;
+        }
+        else if (left_tracking == 0 && right_tracking == 1 && state == 2) {
+            return true;
+        }
+        else if (left_tracking == 1 && right_tracking == 1 && state == 3) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    //% block="connect %pin Tilt Sensor Tilt %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_Tilt_sensor(pin: DigitalPin, state: Tilt_Sensor_state): boolean {
+        pins.setPull(pin, PinPullMode.PullUp)
+        let tilt = pins.digitalReadPin(pin)
+        if (tilt == 1 && state == 0)
+            return true;
+        else if (tilt == 0 && state == 1)
+            return true;
+        else {
+            return false;
+        }
+    }
+    //% block="connect IIC RTC1307 set %datatype |%data"
+    //% subcategory="Sensor"
+    //% group=RTC1307
+    export function octopus_RTC_setTime(datatype: TimeType_state, data: number): void {
+        switch (datatype) {
+            case 0:
+                RTC_setReg(DS1307_REG_SECOND, DecToHex(data % 60))
+                break
+            case 1:
+                RTC_setReg(DS1307_REG_MINUTE, DecToHex(data % 60))
+                break
+            case 2:
+                RTC_setReg(DS1307_REG_HOUR, DecToHex(data % 24))
+                break
+            case 3:
+                RTC_setReg(DS1307_REG_DAY, DecToHex(data % 32))
+                break
+            case 4:
+                RTC_setReg(DS1307_REG_MONTH, DecToHex(data % 13))
+                break
+            case 5:
+                RTC_setReg(DS1307_REG_YEAR, DecToHex(data % 100))
+                break
+            default:
+                break
+        }
+    }
+    //% block="connect IIC RTC1307 value %data"
+    //% subcategory="Sensor"
+    //% group=RTC1307
+    export function octopus_RTC_getTime(data: TimeType_state): number {
+        switch (data) {
+            case 0:
+                return HexToDec(RTC_getReg(DS1307_REG_SECOND))
+                break
+            case 1:
+                return HexToDec(RTC_getReg(DS1307_REG_MINUTE))
+                break
+            case 2:
+                return HexToDec(RTC_getReg(DS1307_REG_HOUR))
+                break
+            case 3:
+                return HexToDec(RTC_getReg(DS1307_REG_DAY))
+                break
+            case 4:
+                return HexToDec(RTC_getReg(DS1307_REG_MONTH))
+                break
+            case 5:
+                return (HexToDec(RTC_getReg(DS1307_REG_YEAR)) + 2000)
+                break
+            default:
+                return 0
+        }
+    }
+    //% block="weekday"
+    //% subcategory="Sensor"
+    //% group=RTC1307
+    export function octopus_RTC_getWeekday(): number {
+        // (d+2*m+3*(m+1)/5+y+y/4-y/100+y/400) mod 7
+        let d = HexToDec(RTC_getReg(DS1307_REG_DAY))
+        let m = HexToDec(RTC_getReg(DS1307_REG_MONTH))
+        let y = (HexToDec(RTC_getReg(DS1307_REG_YEAR)) + 2000)
+        if (m < 3) {
+            y = y - 1
+            m = m + 12
+        }
+        let w = d
+            + 2 * m
+            + Math.idiv(3 * (m + 1), 5)
+            + y
+            + Math.idiv(y, 4)
+            - Math.idiv(y, 100)
+            + Math.idiv(y, 400)
+            + 1
+        return w % 7
+    }
+	//% block="connect %pin Photo Interrupter %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_Photo_Interrupter(pin: DigitalPin, state: Photo_Sensor_state): boolean {
+        let temp = pins.digitalReadPin(pin)
+        if (temp == 1 && state == 0)
+            return true;
+        else if (temp == 0 && state == 1)
+            return true;
+        else {
+            return false;
+        }
+    }
+	//% block="connect %pin Crash Sensor %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_Photo_Interrupter(pin: DigitalPin, state: Photo_Sensor_state): boolean {
+        let temp = pins.digitalReadPin(pin)
+        if (temp == 1 && state == 0)
+            return true;
+        else if (temp == 0 && state == 1)
+            return true;
+        else {
+            return false;
+        }
+    }
+
+
     /***************************************************************************************************************************************/
 }
