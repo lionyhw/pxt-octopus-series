@@ -1,2 +1,2 @@
-# pxt-octoputs
-octoputs electronic blocks for micro:bit
+# pxt-octopus
+octopus electronic blocks for micro:bit
