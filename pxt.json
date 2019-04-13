@@ -1,7 +1,7 @@
 {
-    "name": "octoputs",
+    "name": "octopus",
     "version": "1.0.0",
-    "description": "octoputs Electronic blocks for micro:bit by ELECFREAKS ",
+    "description": "octopus Electronic blocks for micro:bit by ELECFREAKS ",
     "license": "MIT",
     "dependencies": {
         "core": "*"
