@@ -4,9 +4,11 @@
     "description": "octoputs Electronic blocks for micro:bit by ELECFREAKS ",
     "license": "MIT",
     "dependencies": {
+        "core": "*"
     },
     "files": [
-        "README.md"
+        "README.md",
+        "octopus.ts"
     ],
     "testFiles": [
     ],
