@@ -727,7 +727,8 @@ namespace octopus_output {
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
     //% state.fieldOptions.columns=2
-    export function octopus_Photo_Interrupter(pin: DigitalPin, state: Photo_Sensor_state): boolean {
+    export function octopus_Crash(pin: DigitalPin, state: Button_state): boolean {
+		pins.setPull(pin, PinPullMode.PullUp)
         let temp = pins.digitalReadPin(pin)
         if (temp == 1 && state == 0)
             return true;
