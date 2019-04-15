@@ -767,10 +767,10 @@ namespace octopus_output {
             return false;
         }
     }
-    //% blockId="readdht11" block="connect %pin DHT11 sensor %state"
+    //% block="connect %pin DHT11 sensor %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
-    export function temperature(pin: DigitalPin, state: DHT11_state): number {
+    export function octopus_temperature(pin: DigitalPin, state: DHT11_state): number {
         pins.digitalWritePin(pin, 0)
         basic.pause(18)
         let i = pins.digitalReadPin(pin)
