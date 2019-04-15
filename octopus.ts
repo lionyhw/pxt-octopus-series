@@ -461,10 +461,7 @@ namespace octopus_output {
             case 1:
                 pins.digitalWritePin(pin, 0);
                 break;
-
-
         }
-
     }
     //% block="connect IIC 8*16 Matrix Draw|X %x|Y %y"
     //% subcategory="Output"
@@ -826,6 +823,21 @@ namespace octopus_output {
             }
         }
 
+    }
+	//% block="connect %pin Rain/Steam Sensor Value(0~100)"
+    //% subcategory="Sensor"
+    //% group=AnalogPin
+    export function octopus_Rotation(pin: AnalogPin): number {
+		let value = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100)
+        return value
+		
+    }
+	//% block="connect %pin Soil Moisture Sensor Value(0~100)"
+    //% subcategory="Sensor"
+    //% group=AnalogPin
+    export function octopus_Rotation(pin: AnalogPin): number {
+        let value = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100)
+        return value
     }
 
 
