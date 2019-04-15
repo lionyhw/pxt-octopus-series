@@ -149,13 +149,27 @@ namespace octopus_output {
         //% block="year" enumval=5
         YEAR
     }
-	export enum Photo_Sensor_state {
+    export enum Photo_Sensor_state {
         //% block="◌" enumval=0
         Tracking_State_0,
         //% block="●" enumval=1
         Tracking_State_1
     }
-	
+    export enum Vibration_Sensor_state {
+        //% block="vibrate" enumval=0
+        vibrate,
+        //% block="static" enumval=1
+        static
+    }
+    export enum DHT11_state {
+        //% block="temperature(℃)" enumval=0
+        DHT11_temperature_C,
+        //% block="temperature(℉)" enumval=1
+        DHT11_temperature_F,
+        //% block="humidity(RH)" enumval=2
+        DHT11_humidity
+    }
+
 
     /***************************************************************************************************************/
 
@@ -707,7 +721,7 @@ namespace octopus_output {
             + 1
         return w % 7
     }
-	//% block="connect %pin Photo Interrupter %state"
+    //% block="connect %pin Photo Interrupter %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -722,13 +736,13 @@ namespace octopus_output {
             return false;
         }
     }
-	//% block="connect %pin Crash Sensor %state"
+    //% block="connect %pin Crash Sensor %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
     //% state.fieldOptions.columns=2
     export function octopus_Crash(pin: DigitalPin, state: Button_state): boolean {
-		pins.setPull(pin, PinPullMode.PullUp)
+        pins.setPull(pin, PinPullMode.PullUp)
         let temp = pins.digitalReadPin(pin)
         if (temp == 1 && state == 0)
             return true;
@@ -737,6 +751,81 @@ namespace octopus_output {
         else {
             return false;
         }
+    }
+    //% block="connect %pin Vibration sensor %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_Vibration(pin: DigitalPin, state: Vibration_Sensor_state): boolean {
+        let temp = pins.digitalReadPin(pin)
+        if (temp == 1 && state == 0)
+            return true;
+        else if (temp == 0 && state == 1)
+            return true;
+        else {
+            return false;
+        }
+    }
+    //% blockId="readdht11" block="connect %pin DHT11 sensor %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    export function temperature(pin: DigitalPin, state: DHT11_state): number {
+        pins.digitalWritePin(pin, 0)
+        basic.pause(18)
+        let i = pins.digitalReadPin(pin)
+        pins.setPull(pin, PinPullMode.PullUp);
+
+        while (pins.digitalReadPin(pin) == 1);
+        while (pins.digitalReadPin(pin) == 0);
+        while (pins.digitalReadPin(pin) == 1);
+
+        let value = 0;
+        let counter = 0;
+        let error = 0;
+
+        for (let i = 0; i <= 32 - 1; i++) {
+            while (pins.digitalReadPin(pin) == 0) {
+                //check if the wait is too long, 1000 is arbituary
+                counter++;
+                if (counter == 1000) {
+                    error = 1;
+                }
+            }
+            counter = 0
+            while (pins.digitalReadPin(pin) == 1) {
+                counter += 1;
+            }
+            if (counter > 3) {
+                value = value + (1 << (31 - i));
+                //check if the wait is too long, 1000 is arbituary
+                if (counter >= 1000) {
+                    error = 2;
+                }
+            }
+        }
+        if (error == 1) {
+            return 1001;
+        }
+        else if (error == 2) {
+            return 1002;
+        }
+        else {
+            switch (state) {
+                case 0:
+                    return (value & 0x0000ff00) >> 8
+                    break;
+                case 1:
+                    return ((value & 0x0000ff00) >> 8) * 9 / 5 + 32
+                    break;
+                case 2:
+                    return value >> 24
+                    break;
+                default:
+                    return 0;
+            }
+        }
+
     }
 
 
