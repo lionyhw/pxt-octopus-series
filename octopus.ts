@@ -6,7 +6,7 @@
 
 
 //% weight=100 color=#fc8715  icon="\uf1e6" block="octopus"
-//% groups='["8*16Matrix","DigitalPin","AnalogPin","IIC Interface","RTC1307"]'
+//% groups='["8*16Matrix","DigitalPin","AnalogPin","IIC Interface","RTC1307","DoublePin"]'
 namespace octopus_output {
     /************************************************************Value********************************************************/
     let initialized = false
@@ -174,6 +174,12 @@ namespace octopus_output {
         //% block="none" enumval=1
         none
 	}
+	export enum tmp36_state {
+    //% block="(℃)" enumval=0
+    temperature_C,
+    //% block="(℉)" enumval=1
+    temperature_F,
+}
 
 
     /***************************************************************************************************************/
@@ -772,7 +778,7 @@ namespace octopus_output {
     //% block="connect %pin DHT11 sensor %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
-    export function octopus_temperature(pin: DigitalPin, state: DHT11_state): number {
+    export function octopus_DHT11(pin: DigitalPin, state: DHT11_state): number {
         pins.digitalWritePin(pin, 0)
         basic.pause(18)
         let i = pins.digitalReadPin(pin)
@@ -948,7 +954,7 @@ namespace octopus_output {
             noise = pins.map(
                 noise,
                 101,
-                150,5tg
+                150,
                 80,
                 85
             )
@@ -986,6 +992,75 @@ namespace octopus_output {
         else {
             return false;
         }
+    }
+	//% block="connect %pin TMP36 Sensor %state"
+	//% subcategory="Sensor"
+    //% group=AnalogPin
+	//% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_tmp36(pin: AnalogPin,state: tmp36_state): number {
+        let voltage = 0;
+        let Temperature = 0;
+        voltage = pins.map(
+            pins.analogReadPin(pin),
+            0,
+            1023,
+            0,
+            3100
+        );
+        Temperature = (voltage - 500) / 10;
+
+        switch (state) {
+            case 0:
+                return Math.round(Temperature)
+                break;
+            case 1:
+                return Math.round(Temperature * 9 / 5 + 32)
+                break;
+            default:
+                return 0
+        }
+    }
+	//% block="connect %pin wind sensor speed(m/s)"
+	//% subcategory="Sensor"
+    //% group=AnalogPin
+    export function octopus_WindSpeed(pin: AnalogPin): number {
+        let voltage = 0;
+        let windspeed = 0;
+        voltage = pins.map(
+            pins.analogReadPin(pin),
+            0,
+            1023,
+            0,
+            3100
+        );
+        windspeed = voltage / 40;
+        return Math.round(windspeed)
+    }
+	//% block="connect LED %vLED| out %vo dust sensor value"
+	//% subcategory="Sensor"
+    //% group=DoublePin
+    export function octopus_ReadDust(vLED: DigitalPin, vo: AnalogPin): number {
+        let voltage = 0;
+        let dust = 0;
+        pins.digitalWritePin(vLED, 0);
+        control.waitMicros(160);
+        voltage = pins.analogReadPin(vo);
+        control.waitMicros(100);
+        pins.digitalWritePin(vLED, 1);
+        voltage = pins.map(
+            voltage,
+            0,
+            1023,
+            0,
+            3100 / 2 * 3
+        );
+        dust = (voltage - 380) * 5 / 29;
+        if (dust < 0) {
+            dust = 0
+        }
+        return Math.round(dust)
+
     }
 	
 
