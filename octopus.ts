@@ -948,7 +948,7 @@ namespace octopus_output {
             noise = pins.map(
                 noise,
                 101,
-                150,
+                150,5tg
                 80,
                 85
             )
