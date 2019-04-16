@@ -169,7 +169,7 @@ namespace octopus_output {
         DHT11_humidity
     }
 	export enum PIR_state{
-		//% block="animal\human" enumval=0
+		//% block="animal|human" enumval=0
         human,
         //% block="none" enumval=1
         none
