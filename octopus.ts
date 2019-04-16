@@ -168,6 +168,12 @@ namespace octopus_output {
         //% block="humidity(RH)" enumval=2
         DHT11_humidity
     }
+	export enum PIR_state{
+		//% block="animal\human" enumval=0
+        human,
+        //% block="none" enumval=1
+        none
+	}
 
 
     /***************************************************************************************************************/
@@ -826,7 +832,7 @@ namespace octopus_output {
 	//% block="connect %pin Rain/Steam Sensor Value(0~100)"
     //% subcategory="Sensor"
     //% group=AnalogPin
-    export function octopus_Rotation(pin: AnalogPin): number {
+    export function octopus_Rain(pin: AnalogPin): number {
 		let value = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100)
         return value
 		
@@ -834,7 +840,7 @@ namespace octopus_output {
 	//% block="connect %pin Soil Moisture Sensor Value(0~100)"
     //% subcategory="Sensor"
     //% group=AnalogPin
-    export function octopus_Rotation(pin: AnalogPin): number {
+    export function octopus_Soil_Moisture(pin: AnalogPin): number {
         let value = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100)
         return value
     }
@@ -965,6 +971,21 @@ namespace octopus_output {
         }
         noise = Math.round(noise)
         return Math.round(noise)
+    }
+	//% block="connect %pin PIR Sensor %state"
+    //% subcategory="Sensor"
+    //% group=DigitalPin
+    //% state.fieldEditor="gridpicker"
+    //% state.fieldOptions.columns=2
+    export function octopus_PIR(pin: DigitalPin, state: PIR_state): boolean {
+        let temp = pins.digitalReadPin(pin)
+        if (temp == 1 && state == 0)
+            return true;
+        else if (temp == 0 && state == 1)
+            return true;
+        else {
+            return false;
+        }
     }
 	
 
