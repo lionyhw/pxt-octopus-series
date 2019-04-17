@@ -336,7 +336,7 @@ namespace octopus_output {
 
     /****************************************************************Blockcode******************************************************/
     /*******************Input*****************/
-    //% block="connect %pin Button is %state"
+    //% block="Button connects to %pin Status is %state"
     //% state.fieldEditor="gridpicker"
     //% state.fieldOptions.columns=2
     //% subcategory="Input"
@@ -363,25 +363,25 @@ namespace octopus_output {
                 return false
         }
     }
-    //% block="connect %pin Analog Rotation Value"
+    //% block="Read Analog Rotation value to %pin"
     //% subcategory="Input"
     //% group=AnalogPin
     export function octopus_Rotation(pin: AnalogPin): number {
         return pins.analogReadPin(pin);
     }
-    //% block="connect %pin Black Analog Rotation Value"
+    //% block="Read Black Analog Rotation value to %pin"
     //% subcategory="Input"
     //% group=AnalogPin
     export function octopus_Rotation_Black(pin: AnalogPin): number {
         return pins.analogReadPin(pin);
     }
-    //% block="connect %pin Linear Slider Potentiometer Value"
+    //% block="Read Linear Slider Potentiometer value to %pin"
     //% subcategory="Input"
     //% group=AnalogPin
     export function octopus_Rotation_Linear(pin: AnalogPin): number {
         return pins.analogReadPin(pin);
     }
-    //% block="connect %pin ADKeyPad %state is pressed"
+    //% block="ADKeyPad connects to %pin Press button %state"
     //% state.fieldEditor="gridpicker"
     //% state.fieldOptions.columns=5
     //% subcategory="Input"
@@ -432,7 +432,7 @@ namespace octopus_output {
                 return false
         }
     }
-    //% block="connect %pin Push Lock E-Switch is %state"
+    //% block="Push Lock E-Switch connects to %pin Status is %state"
     //% state.fieldEditor="gridpicker"
     //% state.fieldOptions.columns=2
     //% subcategory="Input"
@@ -461,7 +461,7 @@ namespace octopus_output {
     }
 
     /***************************************************output**************************************************/
-    //% block="connect %pin Relay  %state"
+    //% block="Relay connects to %pin Status is %state"
     //% subcategory="Output"
     //% group=DigitalPin
     export function octopus_Relay(pin: DigitalPin, state: Relay_state): void {
@@ -501,7 +501,7 @@ namespace octopus_output {
         }
         matrixShow();
     }
-    //% block="connect %pin LED set $on"
+    //% block="LED connects to %pin Set $on"
     //% on.shadow="toggleOnOff"
     //% subcategory="Output"
     //% group=DigitalPin
@@ -512,7 +512,7 @@ namespace octopus_output {
             pins.digitalWritePin(pin, 0);
         }
     }
-    //% block="connect %pin 130motor set speed $speed \\%"
+    //% block="130 Motor connects to %pin Set speed $speed \\%"
     //% speed.shadow="speedPicker"
     //% speed.min=0 speed.max=100
     //% subcategory="Output"
@@ -522,7 +522,7 @@ namespace octopus_output {
         pins.analogSetPeriod(pin, 1000)
         pins.analogWritePin(pin, speed)
     }
-    //% block="connect %pin Vibration Motor make vibration %state"
+    //% block="Vibration Motor connects to %pin Set %state"
     //% subcategory="Output"
     //% group=DigitalPin
     export function octopus_Vibration_Motor(pin: DigitalPin, state: Vibration_Motor_state): void {
@@ -542,7 +542,7 @@ namespace octopus_output {
 
     }
     /*****************************************************sensor**************************************************/
-    //% block="connect IIC BME280 value %state"
+    //% block="Read BME280 %state value"
     //% subcategory="Sensor"
     //% group=IIC Interface
     export function octopus_BME280(state: BME280_state): number {
@@ -568,7 +568,7 @@ namespace octopus_output {
         }
         return 0;
     }
-    //% block="connect %pin Sonarbit value %state"
+    //% block="Sonar bit connects to %pin Set unit %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     export function octopus_Sonarbit(pin: DigitalPin, state: Distance_Unit_state): number {
@@ -597,7 +597,7 @@ namespace octopus_output {
                 return 0
         }
     }
-    //% block="connect %pin pm2.5 sensor value"
+    //% block="Read pm2.5 sensor value to %pin"
     //% subcategory="Sensor"
     //% group=DigitalPin
     export function octopus_PM25(pin: DigitalPin): number {
@@ -613,7 +613,7 @@ namespace octopus_output {
         pm25 = pm25 / 1000 - 2
         return pm25;
     }
-    //% block="connect %lpin left port %rpin right port Tracking is %state"
+    //% block="Left port %pin Right port %pin Tracking status is %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     export function octopus_2_Channel_Tracking(lpin: DigitalPin, rpin: DigitalPin, state: Tracking_state): boolean {
@@ -637,7 +637,7 @@ namespace octopus_output {
             return false;
         }
     }
-    //% block="connect %pin Tilt Sensor Tilt %state"
+    //% block="Tilt sensor connects to %pin Set tilt direction to %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -680,7 +680,7 @@ namespace octopus_output {
                 break
         }
     }
-    //% block="connect IIC RTC1307 value %data"
+    //% block="Read IIC RTC1307 value %data"
     //% subcategory="Sensor"
     //% group=RTC1307
     export function octopus_RTC_getTime(data: TimeType_state): number {
@@ -729,7 +729,7 @@ namespace octopus_output {
             + 1
         return w % 7
     }
-    //% block="connect %pin Photo Interrupter %state"
+    //% block="Photo Interrupter connects to %pin Status is %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -744,7 +744,7 @@ namespace octopus_output {
             return false;
         }
     }
-    //% block="connect %pin Crash Sensor %state"
+    //% block="Crash sensor connects to %pin Status is %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -760,7 +760,7 @@ namespace octopus_output {
             return false;
         }
     }
-    //% block="connect %pin Vibration sensor %state"
+    //% block="Vibration sensor connects to %pin Status is %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -775,7 +775,7 @@ namespace octopus_output {
             return false;
         }
     }
-    //% block="connect %pin DHT11 sensor %state"
+    //% block="DHT11 sensor connects to %pin Set unit in %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     export function octopus_DHT11(pin: DigitalPin, state: DHT11_state): number {
@@ -835,7 +835,7 @@ namespace octopus_output {
         }
 
     }
-	//% block="connect %pin Rain/Steam Sensor Value(0~100)"
+	//% block="Read Rain/Steam sensor value (0~100) to %pin"
     //% subcategory="Sensor"
     //% group=AnalogPin
     export function octopus_Rain(pin: AnalogPin): number {
@@ -843,14 +843,14 @@ namespace octopus_output {
         return value
 		
     }
-	//% block="connect %pin Soil Moisture Sensor Value(0~100)"
+	//% block="Read Soil Moisture sensor value (0~100) to %pin"
     //% subcategory="Sensor"
     //% group=AnalogPin
     export function octopus_Soil_Moisture(pin: AnalogPin): number {
         let value = Math.map(pins.analogReadPin(pin), 0, 1023, 0, 100)
         return value
     }
-	//% block="connect %pin Light intensity value(0~100)"
+	//% block="Read Light Intensity value (0~100) to %pin"
 	//% subcategory="Sensor"
     //% group=AnalogPin
     export function octopus_light_sensor(pin: AnalogPin): number {
@@ -866,7 +866,7 @@ namespace octopus_output {
         lightintensity = voltage;
         return Math.round(lightintensity)
     }
-	//% block="connect %pin Noise sensor noise(dB)"
+	//% block="Read Noise sensor noise (dB) to %pin"
 	//% subcategory="Sensor"
     //% group=AnalogPin
     export function octopus_ReadNoise(pin: AnalogPin): number {
@@ -978,7 +978,7 @@ namespace octopus_output {
         noise = Math.round(noise)
         return Math.round(noise)
     }
-	//% block="connect %pin PIR Sensor %state"
+	//% block="PIR Sensor connects to (%pin) Set object to %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
@@ -993,7 +993,7 @@ namespace octopus_output {
             return false;
         }
     }
-	//% block="connect %pin TMP36 Sensor %state"
+	//% block="Read TMP36 sensor to %pin Set unit in %state"
 	//% subcategory="Sensor"
     //% group=AnalogPin
 	//% state.fieldEditor="gridpicker"
@@ -1021,7 +1021,7 @@ namespace octopus_output {
                 return 0
         }
     }
-	//% block="connect %pin wind sensor speed(m/s)"
+	//% block="Read Wind sensor speed(m/s) to %pin"
 	//% subcategory="Sensor"
     //% group=AnalogPin
     export function octopus_WindSpeed(pin: AnalogPin): number {
@@ -1037,7 +1037,7 @@ namespace octopus_output {
         windspeed = voltage / 40;
         return Math.round(windspeed)
     }
-	//% block="connect LED %vLED| out %vo dust sensor value"
+	//% block="Read Dust sensor value to LED in %vLED out in %vo"
 	//% subcategory="Sensor"
     //% group=DoublePin
     export function octopus_ReadDust(vLED: DigitalPin, vo: AnalogPin): number {
