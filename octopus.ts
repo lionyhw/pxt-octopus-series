@@ -978,7 +978,7 @@ namespace octopus_output {
         noise = Math.round(noise)
         return Math.round(noise)
     }
-	//% block="PIR Sensor connects to (%pin) Set object to %state"
+    //% block="PIR sensor connects to %pin Set object to %state"
     //% subcategory="Sensor"
     //% group=DigitalPin
     //% state.fieldEditor="gridpicker"
