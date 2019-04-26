@@ -1,7 +1,7 @@
 # Octopus series Package
 ---
 
-![](/image.png/)
+![](/icon.png/)
 octopus electronic blocks  for micro:bit
 
 # Hardware
