@@ -2,6 +2,7 @@
 ---
 
 ![](/icon.png/)
+
 octopus electronic blocks  for micro:bit
 
 # Hardware
